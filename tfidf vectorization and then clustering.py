@@ -1,3 +1,4 @@
+import warnings
 # to transfrom our corpus to a tf-idf matrix
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -9,13 +10,14 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import AgglomerativeClustering
 
-
 # to visualize the n-dimensional tf-idf matrix in 2-dimensional plot
 from sklearn.decomposition import PCA
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
+warnings.filterwarnings("ignore")
 
 # reading the corpus from the document
 df = pd.read_excel('lemmatized_texts.xlsx')
@@ -26,7 +28,7 @@ texts = [str(text) for text in df['Текст открытки']]
 # making a vectorizer
 vectorizer = TfidfVectorizer()
 
-# fir_transfrom method learns all our corpus and transfrom it to the tf-idf matrix
+# fit_transfrom method learns all our corpus and transfrom it to the tf-idf matrix
 matrix = vectorizer.fit_transform(texts)
 
 # using K-Means clustering method
