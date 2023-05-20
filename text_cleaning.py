@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 import nltk  # for getting a list of stopwords
 from pymorphy2 import MorphAnalyzer  # for lemmatization
 
@@ -14,6 +15,13 @@ def clean(text):
         else:
             cleaned_text += ' '
     return cleaned_text
+
+
+# def is_rus(text):
+#     if text.isascii():
+#         return False
+#
+#     return True
 
 
 def tokenize(text):
@@ -54,7 +62,7 @@ def preprocess(text):
     unite clean, tokenize, remove_stopwords, and lemmatize functions
     returns a string!
     """
-    cleaned_text = clean(text)
+    cleaned_text = clean(text) if not text.isascii() else ''
     tokens = tokenize(cleaned_text)
     cleaned_tokens = remove_stopwords(tokens)
     lemmas = lemmatize(cleaned_tokens)
@@ -62,20 +70,18 @@ def preprocess(text):
     return lemmas
 
 
-# opening our corpus
-df = pd.read_excel('cleaned_corpus.xlsx')
+if __name__ == '__main__':
+    # opening our corpus
+    df = pd.read_excel('cleaned_corpus.xlsx')
 
-# extract texts to a list
-texts = []
-for txt in df['Текст открытки']:
-    texts.append(preprocess(txt))
+    # replace text with preprocessed text
+    df['Текст открытки'] = df['Текст открытки'].apply(preprocess)
 
-# replace texts in the corpus by preprocessed texts
-for txt in df["Текст открытки"]:
-    for i in range(74):
-        df.loc[i, 'Текст открытки'] = texts[i]
+    # finds all rows without text and deletes them
+    condition1 = (df['Текст открытки'].apply(tokenize).apply(len) == 0)
+    condition2 = (df['Текст открытки'].apply(tokenize).apply(len) == 1)
+    df.drop(df[condition1].index, inplace=True)
+    df.drop(df[condition2].index, inplace=True)
 
-# save the corpus with lemmatized texts to a new xlsx document
-# df.to_excel('lemmatized_texts.xlsx', index=False)
-
-
+    # save the corpus with lemmatized texts to a new xlsx document
+    df.to_excel('upd_lemmatized1_texts.xlsx', index=False)
