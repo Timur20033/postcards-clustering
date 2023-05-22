@@ -51,7 +51,7 @@ def lemmatize(tokens):
 
 def remove_non_rus(dataframe, header):
     for text_id, text in enumerate(dataframe[header]):
-        if all(symbol.lower() not in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя123456789' for symbol in text):
+        if all(symbol.lower() not in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789' for symbol in text):
             dataframe.loc[text_id, header] = ''
     return dataframe
 
@@ -86,6 +86,6 @@ for txt in df["Текст открытки"]:
 df = remove_non_rus(df, 'Текст открытки')
 
 # save the corpus with lemmatized texts to a new xlsx document
-# df.to_excel('lemmatized_texts.xlsx', index=False)
+df.to_excel('lemmatized_texts.xlsx', index=False)
 
 
