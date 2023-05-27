@@ -49,12 +49,19 @@ def lemmatize(tokens):
     return lemmas
 
 
+def remove_non_rus(dataframe, header):
+    for text_id, text in enumerate(dataframe[header]):
+        if all(symbol.lower() not in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя123456789' for symbol in text):
+            dataframe.loc[text_id, header] = ''
+    return dataframe
+
+
 def preprocess(text):
     """
     unite clean, tokenize, remove_stopwords, and lemmatize functions
     returns a string!
     """
-    cleaned_text = clean(text) if not text.isascii() else ''
+    cleaned_text = clean(text)
     tokens = tokenize(cleaned_text)
     cleaned_tokens = remove_stopwords(tokens)
     lemmas = lemmatize(cleaned_tokens)
@@ -62,18 +69,23 @@ def preprocess(text):
     return lemmas
 
 
-if __name__ == '__main__':
-    # opening our corpus
-    df = pd.read_excel('cleaned_corpus.xlsx')
+# opening our corpus
+df = pd.read_excel('cleaned_corpus.xlsx')
 
-    # replace text with preprocessed text
-    df['Текст открытки'] = df['Текст открытки'].apply(preprocess)
+# extract texts to a list
+texts = []
+for txt in df['Текст открытки']:
+    texts.append(preprocess(txt))
 
-    # finds all rows without text and deletes them
-    condition1 = (df['Текст открытки'].apply(tokenize).apply(len) == 0)
-    condition2 = (df['Текст открытки'].apply(tokenize).apply(len) == 1)
-    df.drop(df[condition1].index, inplace=True)
-    df.drop(df[condition2].index, inplace=True)
+# replace texts in the corpus by preprocessed texts
+for txt in df["Текст открытки"]:
+    for i in range(74):
+        df.loc[i, 'Текст открытки'] = texts[i]
 
-    # save the corpus with lemmatized texts to a new xlsx document
-    df.to_excel('upd_lemmatized1_texts.xlsx', index=False)
+# cleaning document from non-russian texts
+df = remove_non_rus(df, 'Текст открытки')
+
+# save the corpus with lemmatized texts to a new xlsx document
+# df.to_excel('lemmatized_texts.xlsx', index=False)
+
+
