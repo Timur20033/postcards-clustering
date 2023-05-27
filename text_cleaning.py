@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 import nltk  # for getting a list of stopwords
 from pymorphy2 import MorphAnalyzer  # for lemmatization
 
@@ -15,13 +14,6 @@ def clean(text):
         else:
             cleaned_text += ' '
     return cleaned_text
-
-
-# def is_rus(text):
-#     if text.isascii():
-#         return False
-#
-#     return True
 
 
 def tokenize(text):
