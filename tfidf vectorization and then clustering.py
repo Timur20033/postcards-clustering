@@ -1,8 +1,12 @@
 import warnings
+
 # to transfrom our corpus to a tf-idf matrix
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import pandas as pd
+
+# to scale data
+from sklearn.preprocessing import MinMaxScaler
 
 # methods of clustering
 from sklearn.cluster import KMeans
