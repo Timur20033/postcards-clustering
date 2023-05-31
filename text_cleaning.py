@@ -1,20 +1,16 @@
 import pandas as pd
-import nltk  # for getting a list of stopwords
+import spacy  # for getting a list of stopwords
 from pymorphy2 import MorphAnalyzer  # for lemmatization
 import warnings
+import re
 
 
-def clean(text):
+def clean_and_tokenize(text):
     """
     cleans text from bad symbols
     """
-    cleaned_text = ''
-    for symbol in text:
-        if symbol.isalnum() or symbol == ' ':
-            cleaned_text += symbol
-        else:
-            cleaned_text += ' '
-    return cleaned_text
+    tokenized = re.findall(r'[а-я]+', text, flags=re.IGNORECASE)
+    return [i.lower() for i in tokenized]
 
 
 def tokenize(text):
@@ -30,8 +26,9 @@ def remove_stopwords(tokens):
     """
     removes stopwords from tokens sequence
     """
-    stopwords = nltk.corpus.stopwords.words('russian')
-    stopwords.append('нрзб')
+    nlp = spacy.load("ru_core_news_sm")
+    stopwords = nlp.Defaults.stop_words
+    nlp.Defaults.stop_words |= {'нрзб', 'го', 'г', 'н'}
     cleaned_tokens = []
     for token in tokens:
         if token not in stopwords:
@@ -61,8 +58,7 @@ def preprocess(text):
     unite clean, tokenize, remove_stopwords, and lemmatize functions
     returns a string!
     """
-    cleaned_text = clean(text)
-    tokens = tokenize(cleaned_text)
+    tokens = clean_and_tokenize(text)
     cleaned_tokens = remove_stopwords(tokens)
     lemmas = lemmatize(cleaned_tokens)
     lemmas = ' '.join(lemmas)
